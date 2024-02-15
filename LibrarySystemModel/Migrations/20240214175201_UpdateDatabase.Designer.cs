@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibrarySystemModel.Migrations
 {
     [DbContext(typeof(LibraryDatabaseContext))]
-    [Migration("20240206154813_UpdateReaderTable")]
-    partial class UpdateReaderTable
+    [Migration("20240214175201_UpdateDatabase")]
+    partial class UpdateDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -114,6 +114,12 @@ namespace LibrarySystemModel.Migrations
                         .HasColumnType("int")
                         .HasColumnName("PublishingTypeID");
 
+                    b.Property<int?>("ReaderId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ReturnDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<int?>("Year")
                         .HasColumnType("int");
 
@@ -122,7 +128,38 @@ namespace LibrarySystemModel.Migrations
 
                     b.HasIndex("PublishingTypeId");
 
+                    b.HasIndex("ReaderId");
+
                     b.ToTable("Book", (string)null);
+                });
+
+            modelBuilder.Entity("LibrarySystemModel.BorrowedBook", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("BorrowDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ReaderId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ReturnDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("ReaderId");
+
+                    b.ToTable("BorrowedBooks");
                 });
 
             modelBuilder.Entity("LibrarySystemModel.DocumentType", b =>
@@ -144,8 +181,11 @@ namespace LibrarySystemModel.Migrations
             modelBuilder.Entity("LibrarySystemModel.Librarian", b =>
                 {
                     b.Property<int>("LibrarianId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("LibrarianID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LibrarianId"));
 
                     b.Property<string>("Email")
                         .HasMaxLength(100)
@@ -184,8 +224,11 @@ namespace LibrarySystemModel.Migrations
             modelBuilder.Entity("LibrarySystemModel.Reader", b =>
                 {
                     b.Property<int>("ReaderId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("ReaderID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReaderId"));
 
                     b.Property<int?>("DocumentTypeId")
                         .HasColumnType("int")
@@ -260,7 +303,30 @@ namespace LibrarySystemModel.Migrations
                         .HasForeignKey("PublishingTypeId")
                         .HasConstraintName("FK__Book__Publishing__440B1D61");
 
+                    b.HasOne("LibrarySystemModel.Reader", null)
+                        .WithMany("Books")
+                        .HasForeignKey("ReaderId");
+
                     b.Navigation("PublishingType");
+                });
+
+            modelBuilder.Entity("LibrarySystemModel.BorrowedBook", b =>
+                {
+                    b.HasOne("LibrarySystemModel.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LibrarySystemModel.Reader", "Reader")
+                        .WithMany("BorrowedBooks")
+                        .HasForeignKey("ReaderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("Reader");
                 });
 
             modelBuilder.Entity("LibrarySystemModel.Reader", b =>
@@ -281,6 +347,13 @@ namespace LibrarySystemModel.Migrations
             modelBuilder.Entity("LibrarySystemModel.PublishingType", b =>
                 {
                     b.Navigation("Books");
+                });
+
+            modelBuilder.Entity("LibrarySystemModel.Reader", b =>
+                {
+                    b.Navigation("Books");
+
+                    b.Navigation("BorrowedBooks");
                 });
 #pragma warning restore 612, 618
         }
