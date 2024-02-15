@@ -27,6 +27,8 @@ public partial class LibraryDatabaseContext : DbContext
 
     public virtual DbSet<Reader> Readers { get; set; }
 
+    public virtual DbSet<BorrowedBook> BorrowedBooks { get; set; } 
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlServer("Data Source=DESKTOP-M2NQCIO\\SQLEXPRESS;Initial Catalog=LibraryDatabase;Integrated Security=True;Trust Server Certificate=True");
 

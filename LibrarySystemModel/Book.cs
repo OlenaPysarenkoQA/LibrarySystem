@@ -19,6 +19,8 @@ public partial class Book
 
     public string? City { get; set; }
 
+    public DateTime? ReturnDate { get; set; } // Додано поле для зберігання дати повернення
+
     public virtual PublishingType? PublishingType { get; set; }
 
     public virtual ICollection<Author> Authors { get; set; } = new List<Author>();
